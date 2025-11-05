@@ -1,282 +1,37 @@
 <!DOCTYPE html>
-<html lang="en-us">
+<html>
 
 <head>
-    <meta charset="utf-8">
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Unity WebGL Player | Gem Hunter Match</title>
+    <meta charset="UTF-8">
+    <title>My Unity WebGL Games</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         body {
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            overflow: hidden;
-        }
-
-        #unity-container {
-            position: relative;
-            width: 720px;
-            height: 1280px;
-            max-width: 90vw;
-            max-height: 90vh;
-            background: #231F20;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-            overflow: hidden;
-        }
-
-        #unity-canvas {
-            width: 100%;
-            height: 100%;
-            display: block;
-            background: #231F20;
-            cursor: pointer;
-        }
-
-        #loading-cover {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            transition: opacity 0.5s ease-out;
-        }
-
-        #loading-cover.hidden {
-            opacity: 0;
-            pointer-events: none;
-        }
-
-        .game-title {
-            color: #fff;
-            font-size: 32px;
-            font-weight: bold;
-            margin-bottom: 30px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-            animation: pulse 2s ease-in-out infinite;
-        }
-
-        @keyframes pulse {
-
-            0%,
-            100% {
-                transform: scale(1);
-            }
-
-            50% {
-                transform: scale(1.05);
-            }
-        }
-
-        .spinner {
-            width: 60px;
-            height: 60px;
-            border: 5px solid rgba(255, 255, 255, 0.3);
-            border-top: 5px solid #fff;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-bottom: 30px;
-        }
-
-        @keyframes spin {
-            0% {
-                transform: rotate(0deg);
-            }
-
-            100% {
-                transform: rotate(360deg);
-            }
-        }
-
-        #loading-text {
-            color: #fff;
-            font-size: 18px;
-            margin-bottom: 20px;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
-        }
-
-        .progress-bar-container {
-            width: 300px;
-            height: 25px;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 15px;
-            overflow: hidden;
-            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
-        }
-
-        .progress-bar-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #4CAF50, #8BC34A);
-            width: 0%;
-            transition: width 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #fff;
-            font-weight: bold;
-            font-size: 12px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-        }
-
-        .error-message {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: #ff5555;
-            color: #fff;
-            padding: 30px;
-            border-radius: 15px;
-            max-width: 80%;
+            font-family: sans-serif;
+            background: #111;
+            color: #eee;
             text-align: center;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            z-index: 2000;
+            padding: 40px;
         }
 
-        .error-message h3 {
-            margin-bottom: 15px;
-            font-size: 24px;
+        a {
+            display: block;
+            color: #4cf;
+            margin: 10px;
+            font-size: 1.2em;
+            text-decoration: none;
         }
 
-        .error-message p {
-            line-height: 1.6;
-            font-size: 14px;
-        }
-
-        @media (max-width: 768px) {
-            #unity-container {
-                width: 100vw;
-                height: 100vh;
-                max-width: 100vw;
-                max-height: 100vh;
-                border-radius: 0;
-            }
-
-            .game-title {
-                font-size: 24px;
-            }
-
-            .progress-bar-container {
-                width: 250px;
-            }
+        a:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
 
 <body>
-    <div id="unity-container">
-        <canvas id="unity-canvas" tabindex="1"></canvas>
-        <div id="loading-cover">
-            <div class="game-title">🎮 Gem Hunter Match</div>
-            <div class="spinner"></div>
-            <div id="loading-text">Загрузка игры...</div>
-            <div class="progress-bar-container">
-                <div class="progress-bar-fill" id="progress-fill">0%</div>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        console.log('🎮 Starting Unity WebGL Game...');
-
-        const canvas = document.querySelector("#unity-canvas");
-        const loadingCover = document.querySelector("#loading-cover");
-        const loadingText = document.querySelector("#loading-text");
-        const progressFill = document.querySelector("#progress-fill");
-
-        let unityInstance = null;
-
-        function hideLoadingScreen() {
-            console.log('✅ Game loaded successfully!');
-            loadingCover.classList.add('hidden');
-            setTimeout(() => {
-                loadingCover.style.display = 'none';
-            }, 500);
-        }
-
-        function showError(message) {
-            console.error('❌ Error:', message);
-            loadingCover.innerHTML = `
-          <div class="error-message">
-            <h3>⚠️ Ошибка загрузки</h3>
-            <p>${message}</p>
-          </div>
-        `;
-        }
-
-        if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
-            const meta = document.createElement('meta');
-            meta.name = 'viewport';
-            meta.content = 'width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes';
-            document.getElementsByTagName('head')[0].appendChild(meta);
-
-            canvas.style.width = "100%";
-            canvas.style.height = "100%";
-            canvas.style.position = "fixed";
-            document.body.style.textAlign = "left";
-        }
-
-
-        const config = {
-            dataUrl: "Build.data.unityweb",
-            frameworkUrl: "Build.framework.js.unityweb",
-            codeUrl: "Build.wasm.unityweb",
-            streamingAssetsUrl: "StreamingAssets",
-            companyName: "DefaultCompany",
-            productName: "Gem Hunter Match - 2D Sample Project",
-            productVersion: "1.6",
-        };
-
-        console.log('📦 Loading Unity build files...');
-
-        const loaderScript = document.createElement("script");
-        loaderScript.src = "Build.loader.js";
-
-        loaderScript.onload = function () {
-            console.log('✅ Build.loader.js loaded');
-
-            if (typeof createUnityInstance === 'undefined') {
-                showError('Ошибка: createUnityInstance не найден');
-                return;
-            }
-
-            createUnityInstance(canvas, config, function (progress) {
-                const percent = Math.round(progress * 100);
-                progressFill.style.width = percent + "%";
-                progressFill.innerText = percent + "%";
-                loadingText.innerText = `Загрузка: ${percent}%`;
-            }).then(function (instance) {
-                unityInstance = instance;
-                hideLoadingScreen();
-                canvas.focus();
-                console.log('🎮 Game ready!');
-            }).catch(function (message) {
-                showError(`Ошибка: ${message}`);
-            });
-        };
-
-        loaderScript.onerror = function () {
-            showError('Не удалось загрузить Build.loader.js<br>Используйте HTTP сервер!');
-        };
-
-        document.body.appendChild(loaderScript);
-    </script>
+    <h1>🎮 My Unity WebGL Games</h1>
+    <a href="GemMatch/">Gem Match</a>
+    <a href="SpaceShooter/">Space Shooter</a>
+    <a href="PuzzleGame/">Puzzle Game</a>
 </body>
 
 </html>

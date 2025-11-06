@@ -3,32 +3,44 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>My Unity WebGL Games</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎮 Unity WebGL Games</title>
     <style>
         body {
-            font-family: sans-serif;
+            font-family: system-ui, sans-serif;
             background: #111;
             color: #eee;
             text-align: center;
-            padding: 40px;
+            padding: 2rem;
+            margin: 0;
+        }
+
+        h1 {
+            font-size: clamp(1.8rem, 5vw, 3rem);
+            margin-bottom: 2rem;
         }
 
         a {
             display: block;
-            color: #4cf;
-            margin: 10px;
-            font-size: 1.2em;
+            font-size: clamp(1.2rem, 4vw, 1.8rem);
             text-decoration: none;
+            color: white;
+            background: #033972;
+            padding: 1rem;
+            margin: 0.8rem auto;
+            border-radius: 0.75rem;
+            max-width: 300px;
+            transition: background 0.2s;
         }
 
         a:hover {
-            text-decoration: underline;
+            background: #0056b3;
         }
     </style>
 </head>
 
 <body>
-    <h1>🎮 My Unity WebGL Games</h1>
+    <h1>🎮 Unity WebGL Games</h1>
     <a href="GemMatch/">Gem Match</a>
     <a href="DragonCrash/">Dragon Crashers</a>
     <a href="FlappyBird/">Flappy Bird</a>
